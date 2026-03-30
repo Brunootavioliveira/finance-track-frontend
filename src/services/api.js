@@ -1,4 +1,4 @@
-const BASE_URL = 'http://finance-track-api-6n9c.onrender.com';
+const BASE_URL = 'https://finance-track-api-6n9c.onrender.com';
 
 
 export const getToken = () => localStorage.getItem('ft_token');
