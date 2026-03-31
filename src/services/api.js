@@ -1,10 +1,12 @@
 const BASE_URL = 'https://finance-track-api-6n9c.onrender.com';
 
-
 export const getToken = () => localStorage.getItem('ft_token');
 export const setToken = (t) => localStorage.setItem('ft_token', t);
 export const removeToken = () => localStorage.removeItem('ft_token');
 export const isAuthenticated = () => !!getToken();
+export const getName = () => localStorage.getItem('ft_name');
+export const setName = (n) => localStorage.setItem('ft_name', n);
+export const removeName = () => localStorage.removeItem('ft_name');
 
 function authHeaders() {
   return {
@@ -21,7 +23,6 @@ async function handleResponse(res) {
   const text = await res.text();
   return text ? JSON.parse(text) : null;
 }
-
 
 export const authAPI = {
   register: (name, email, password) =>
@@ -44,12 +45,10 @@ export const authAPI = {
     }),
 };
 
-
 export const dashboardAPI = {
   get: () =>
     fetch(`${BASE_URL}/dashboard`, { headers: authHeaders() }).then(handleResponse),
 };
-
 
 export const expenseAPI = {
   list: () =>

@@ -4,16 +4,14 @@ import { expenseAPI, incomeAPI, categoryAPI } from '../services/api';
 
 export default function BotaoNovaTransacao({ onSuccess }) {
   const [open, setOpen] = useState(false);
-  const [tab, setTab] = useState('transacao'); // transacao | ategoria
+  const [tab, setTab] = useState('transacao');
 
-  // transação
   const [tipo, setTipo] = useState('saida');
   const [desc, setDesc] = useState('');
   const [valor, setValor] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [categories, setCategories] = useState([]);
 
-  // nova categoria
   const [catName, setCatName] = useState('');
 
   const [loading, setLoading] = useState(false);
@@ -67,33 +65,37 @@ export default function BotaoNovaTransacao({ onSuccess }) {
       setSuccess(`Categoria "${catName}" criada!`);
       await loadCategories();
     } catch (err) {
-      const message = err.response?.data?.message || 'Você já tem uma categoria com esse nome!';
-      setError(message);
-
+      setError(err.message || 'Você já tem uma categoria com esse nome!');
     } finally { setLoading(false); }
   };
 
   return (
     <>
       {open && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center p-4"
+        <div
+          className="fixed inset-0 z-40 flex items-end sm:items-center justify-center p-0 sm:p-4"
           style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
-          onClick={close}>
-          <div className="w-full max-w-sm rounded-2xl p-6 relative"
+          onClick={close}
+        >
+          <div
+            className="w-full sm:max-w-sm rounded-t-3xl sm:rounded-2xl p-6 relative"
             style={{
               background: 'linear-gradient(145deg, #1E2148, #13162B)',
               border: '1px solid rgba(124,92,252,0.25)',
-              boxShadow: '0 24px 80px rgba(0,0,0,0.5), 0 0 60px rgba(124,92,252,0.1)',
+              boxShadow: '0 24px 80px rgba(0,0,0,0.5)',
             }}
-            onClick={e => e.stopPropagation()}>
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Handle bar for mobile */}
+            <div className="w-10 h-1 rounded-full mx-auto mb-4 sm:hidden" style={{ background: 'rgba(255,255,255,0.15)' }} />
 
             <button onClick={close}
-              className="absolute top-4 right-4 w-8 h-8 rounded-lg flex items-center justify-center hover:scale-110 transition-all"
+              className="absolute top-5 right-5 w-8 h-8 rounded-lg flex items-center justify-center hover:scale-110 transition-all"
               style={{ background: 'rgba(255,255,255,0.06)', color: '#8891B4' }}>
               <X size={15} />
             </button>
 
-            <h3 className="text-lg font-bold text-text-primary mb-5">Nova Transação</h3>
+            <h3 className="text-lg font-bold text-white mb-5">Nova Transação</h3>
 
             <div className="flex gap-2 mb-6 p-1 rounded-xl" style={{ background: 'rgba(0,0,0,0.3)' }}>
               {[
@@ -112,7 +114,6 @@ export default function BotaoNovaTransacao({ onSuccess }) {
               ))}
             </div>
 
-            
             {tab === 'transacao' && (
               <div className="flex flex-col gap-4">
                 <div className="flex gap-2 p-1 rounded-xl" style={{ background: 'rgba(0,0,0,0.25)' }}>
@@ -161,7 +162,7 @@ export default function BotaoNovaTransacao({ onSuccess }) {
                 {error && <ErrorMsg msg={error} />}
 
                 <button onClick={submitTransacao} disabled={loading}
-                  className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all duration-200 hover:opacity-90 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 flex items-center justify-center gap-2"
+                  className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all duration-200 hover:opacity-90 active:scale-[0.99] disabled:opacity-60 flex items-center justify-center gap-2"
                   style={{ background: 'linear-gradient(135deg, #7C5CFC, #5B8AF5)', boxShadow: '0 4px 20px rgba(124,92,252,0.4)' }}>
                   {loading && <Loader2 size={15} className="animate-spin" />}
                   Adicionar Transação
@@ -204,7 +205,7 @@ export default function BotaoNovaTransacao({ onSuccess }) {
                 )}
 
                 <button onClick={submitCategoria} disabled={loading}
-                  className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all duration-200 hover:opacity-90 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 flex items-center justify-center gap-2"
+                  className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all duration-200 hover:opacity-90 active:scale-[0.99] disabled:opacity-60 flex items-center justify-center gap-2"
                   style={{ background: 'linear-gradient(135deg, #7C5CFC, #5B8AF5)', boxShadow: '0 4px 20px rgba(124,92,252,0.4)' }}>
                   {loading ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />}
                   Criar Categoria
@@ -216,13 +217,14 @@ export default function BotaoNovaTransacao({ onSuccess }) {
       )}
 
       <button onClick={openModal}
-        className="fixed bottom-8 right-8 z-30 flex items-center gap-3 px-6 py-4 rounded-2xl font-bold text-white text-sm transition-all duration-300 hover:scale-105 active:scale-95"
+        className="fixed bottom-6 right-6 z-30 flex items-center gap-3 px-5 py-4 rounded-2xl font-bold text-white text-sm transition-all duration-300 hover:scale-105 active:scale-95"
         style={{ background: 'linear-gradient(135deg, #7C5CFC 0%, #5B8AF5 100%)', boxShadow: '0 8px 32px rgba(124,92,252,0.45)' }}>
         <div className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
           style={{ background: 'rgba(255,255,255,0.2)' }}>
           <Plus size={14} strokeWidth={2.5} />
         </div>
-        Nova Transação
+        <span className="hidden sm:inline">Nova Transação</span>
+        <span className="sm:hidden">Nova</span>
       </button>
     </>
   );

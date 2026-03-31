@@ -26,7 +26,6 @@ export default function App() {
       ]);
       setDashboard(dash);
 
-      // Merge & sort by dateTime desc
       const all = [
         ...(expenses || []).map(e => ({ ...e, type: 'EXPENSE' })),
         ...(incomes || []).map(i => ({ ...i, type: 'INCOME' })),
@@ -71,14 +70,12 @@ export default function App() {
     { mes: 'Mai', valor: 6000 }, { mes: 'Jun', valor: 4800 },
   ];
 
+  // Category data from backend: expensesByCategory = [{ categoryName, total }]
   const expTotal = Number(dashboard?.totalExpense || 0);
-  const catMap = {};
-  transacoes.filter(t => t.type === 'EXPENSE').forEach(t => {
-    const cat = t.category || 'Outros';
-    catMap[cat] = (catMap[cat] || 0) + Number(t.amount);
-  });
   const catColors = ['#F59E0B', '#7C5CFC', '#22C55E', '#F43F5E', '#8891B4'];
-  const catEntries = Object.entries(catMap).slice(0, 4);
+  const catEntries = (dashboard?.expensesByCategory || [])
+    .slice(0, 5)
+    .map(c => [c.categoryName, Number(c.total)]);
 
   return (
     <div className="min-h-screen" style={{ background: '#0D0F1C' }}>
@@ -97,7 +94,7 @@ export default function App() {
         </div>
       )}
 
-      <main className="relative z-10 max-w-7xl mx-auto px-6 py-8 pb-28 space-y-6">
+      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
         <CardResumo data={dashboard} />
         <GraficoDespesas data={finalChartData} />
 
@@ -144,10 +141,15 @@ export default function App() {
                   <div key={cat} className="mb-3 last:mb-0">
                     <div className="flex justify-between text-xs mb-1.5">
                       <span style={{ color: '#8891B4' }} className="font-medium">{cat}</span>
-                      <span style={{ color: catColors[i % catColors.length] }} className="font-semibold">{pct}%</span>
+                      <div className="flex items-center gap-2">
+                        <span style={{ color: '#6B7280' }} className="font-medium">
+                          R$ {val.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </span>
+                        <span style={{ color: catColors[i % catColors.length] }} className="font-semibold">{pct}%</span>
+                      </div>
                     </div>
                     <div className="h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                      <div className="h-full rounded-full" style={{
+                      <div className="h-full rounded-full transition-all duration-500" style={{
                         width: `${pct}%`,
                         background: catColors[i % catColors.length],
                         opacity: 0.85,

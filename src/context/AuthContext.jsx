@@ -1,7 +1,22 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { authAPI, getToken, removeToken, isAuthenticated } from '../services/api';
+import { authAPI, getToken, removeToken, isAuthenticated, getName, setName, removeName } from '../services/api';
 
 const AuthContext = createContext(null);
+
+function getUserFromToken() {
+  try {
+    const token = getToken();
+    if (!token) return null;
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const savedName = getName();
+    return {
+      email: payload.sub,
+      name: savedName || payload.sub.split('@')[0],
+    };
+  } catch {
+    return null;
+  }
+}
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -9,35 +24,27 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (isAuthenticated()) {
-      try {
-        const token = getToken();
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        setUser({ email: payload.sub, name: payload.sub.split('@')[0] });
-      } catch {
-        setUser({ email: '', name: 'Usuário' });
-      }
+      setUser(getUserFromToken());
     }
     setLoading(false);
   }, []);
 
   const login = async (email, password) => {
     await authAPI.login(email, password);
-    try {
-      const token = getToken();
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      setUser({ email: payload.sub, name: payload.sub.split('@')[0] });
-    } catch {
-      setUser({ email, name: email.split('@')[0] });
-    }
+    setUser(getUserFromToken());
   };
 
   const register = async (name, email, password) => {
     await authAPI.register(name, email, password);
-    await login(email, password);
+    // Salva o nome verdadeiro antes do login
+    setName(name);
+    await authAPI.login(email, password);
+    setUser({ email, name });
   };
 
   const logout = () => {
     removeToken();
+    removeName();
     setUser(null);
   };
 
